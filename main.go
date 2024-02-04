@@ -16,8 +16,6 @@ func gets(in io.Reader) ([]byte, error) {
 	return line[:n], err
 }
 
-// https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-
 var rxPattern = regexp.MustCompile(`\x1B\[(\d+)\;(\d+)R`)
 
 func btoi(b []byte) int {
