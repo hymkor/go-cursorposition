@@ -5,8 +5,6 @@ import (
 	"io"
 	"os"
 	"regexp"
-
-	"golang.org/x/term"
 )
 
 func gets(in io.Reader) ([]byte, error) {
@@ -29,15 +27,8 @@ func btoi(b []byte) int {
 
 var ErrAnsiEscapeSequenceNotSupported = errors.New("ANSI Escape sequence not supported")
 
-func Request() (int, int, error) {
-	io.WriteString(os.Stderr, "\x1B[6n")
-
-	if oldState, err := term.MakeRaw(int(os.Stdin.Fd())); err != nil {
-		return 0, 0, err
-	} else {
-		defer term.Restore(int(os.Stdin.Fd()), oldState)
-	}
-
+func Request(w io.Writer) (int, int, error) {
+	io.WriteString(w, "\x1B[6n")
 	var err error
 	for err == nil {
 		var s []byte
@@ -60,9 +51,9 @@ func Request() (int, int, error) {
 	return 0, 0, err
 }
 
-func AmbiguousWidth() (int, error) {
-	io.WriteString(os.Stderr, "\r\u25BD")
-	_, w, err := Request()
-	io.WriteString(os.Stderr, "\r\x1B[2K")
-	return w - 1, err
+func AmbiguousWidth(w io.Writer) (int, error) {
+	io.WriteString(w, "\r\u25BD")
+	_, col, err := Request(w)
+	io.WriteString(w, "\r\x1B[2K")
+	return col - 1, err
 }

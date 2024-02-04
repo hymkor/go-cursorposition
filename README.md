@@ -8,8 +8,13 @@ Request()
 package main
 
 import (
-    "github.com/hymkor/go-cursorposition"
+    "os"
+
+    "golang.org/x/term"
+
     "github.com/hymkor/go-windows1x-virtualterminal"
+
+    "github.com/hymkor/go-cursorposition"
 )
 
 func main() {
@@ -18,7 +23,12 @@ func main() {
     } else {
         defer closer()
     }
-    row, col, err := cursorposition.Request()
+    if oldState, err := term.MakeRaw(int(os.Stdin.Fd())); err != nil {
+        panic(err.Error())
+    } else {
+        defer term.Restore(int(os.Stdin.Fd()), oldState)
+    }
+    row, col, err := cursorposition.Request(os.Stderr)
     if err != nil {
         println(err.Error())
     } else {
@@ -34,8 +44,13 @@ AmbiguousWidth()
 package main
 
 import (
-    "github.com/hymkor/go-cursorposition"
+    "os"
+
+    "golang.org/x/term"
+
     "github.com/hymkor/go-windows1x-virtualterminal"
+
+    "github.com/hymkor/go-cursorposition"
 )
 
 func main() {
@@ -44,7 +59,12 @@ func main() {
     } else {
         defer closer()
     }
-    w, err := cursorposition.AmbiguousWidth()
+    if oldState, err := term.MakeRaw(int(os.Stdin.Fd())); err != nil {
+        panic(err.Error())
+    } else {
+        defer term.Restore(int(os.Stdin.Fd()), oldState)
+    }
+    w, err := cursorposition.AmbiguousWidth(os.Stderr)
     if err != nil {
         println(err.Error())
     } else {
