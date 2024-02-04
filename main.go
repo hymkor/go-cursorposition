@@ -3,7 +3,6 @@ package cursorposition
 import (
 	"errors"
 	"io"
-	"os"
 	"regexp"
 )
 
@@ -28,11 +27,15 @@ func btoi(b []byte) int {
 var ErrAnsiEscapeSequenceNotSupported = errors.New("ANSI Escape sequence not supported")
 
 func Request(w io.Writer) (int, int, error) {
+	in, err := stdin()
+	if err != nil {
+		return 0, 0, err
+	}
+
 	io.WriteString(w, "\x1B[6n")
-	var err error
 	for err == nil {
 		var s []byte
-		s, err = gets(os.Stdin)
+		s, err = gets(in)
 
 		for len(s) > 0 && s[0] != '\x1B' {
 			s = s[1:]
