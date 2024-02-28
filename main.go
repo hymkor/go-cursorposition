@@ -60,3 +60,12 @@ func AmbiguousWidth(w io.Writer) (int, error) {
 	io.WriteString(w, "\r\x1B[2K")
 	return col - 1, err
 }
+
+func AmbiguousWidthGoTty(tty interface{ Raw() (func() error, error) }, w io.Writer) (int, error) {
+	if f, err := tty.Raw(); err != nil {
+		return 0, err
+	} else {
+		defer f()
+	}
+	return AmbiguousWidth(w)
+}
